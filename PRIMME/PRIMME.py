@@ -56,7 +56,7 @@ class PRIMME(nn.Module):
         self.logy = []
         
         # DEFINE NEURAL NETWORK (originally 21*21*4, 21*21*2, 21*21, self.act_dim ** self.num_dums)
-        norm = 128
+        norm = 512
         self.f1 = nn.Linear(self.obs_dim ** self.num_dims, norm) # Replace with: 512, 256, 128, 64, all of 21*21*4
         self.f2 = nn.Linear(norm, norm)
         self.f3 = nn.Linear(norm, norm)
@@ -412,7 +412,7 @@ class PRIMME(nn.Module):
     
     
     
-def train_primme(trainset, num_eps, obs_dim=17, act_dim=17, lr=5e-5, reg=1, pad_mode="circular", plot_freq=None, if_miso=False, multi_epoch_safe=False):
+def train_primme(trainset, num_eps, obs_dim=17, act_dim=17, lr=5e-5, reg=1, pad_mode="circular", plot_freq=None, if_miso=False, multi_epoch_safe=False, multi_epoch_list=[]):
     
     with h5py.File(trainset, 'r') as f: dims = len(f['ims_id'].shape)-3
     append_name = trainset.split('_kt')[1]
@@ -437,7 +437,8 @@ def train_primme(trainset, num_eps, obs_dim=17, act_dim=17, lr=5e-5, reg=1, pad_
         val_loss = agent.validation_loss[-1]
         if multi_epoch_safe and i % 100 ==0:
             agent.save(f"{modelname[:-3]}_at_epoch({i}).h5")
-
+        if len(multi_epoch_list) > 0 and i in multi_epoch_list:
+            agent.save(f"{modelname[:-3]}_at_epoch({i}).h5")
         if val_loss<best_validation_loss:
             best_validation_loss = val_loss
             agent.save(modelname)

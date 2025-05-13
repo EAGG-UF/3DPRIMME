@@ -360,12 +360,12 @@ def read_grain_centers_txt(fp="Case2_grains_centers"):
     return grain_centers
 
 
-def voronoi2image(size=[128, 64, 32], ngrain=512, memory_limit=1e9, p=2, center_coords0=None, device=device):          
+def voronoi2image(size=[128, 64, 32], ngrain=512, memory_limit=16e9, p=2, center_coords0=None, device=device):          
     
     #SETUP AND EDIT LOCAL VARIABLES
     dim = len(size)
     
-    #GENERATE RENDOM GRAIN CENTERS
+    #GENERATE RANDOM GRAIN CENTERS
     # center_coords = torch.cat([torch.randint(0, size[i], (ngrain,1)) for i in range(dim)], dim=1).float().to(device)
     # center_coords0 = torch.cat([torch.randint(0, size[i], (ngrain,1)) for i in range(dim)], dim=1).float()
     if center_coords0 is None: center_coords0 = generate_random_grain_centers(size, ngrain)
@@ -426,6 +426,8 @@ def voronoi2image(size=[128, 64, 32], ngrain=512, memory_limit=1e9, p=2, center_
         return all_ids.cpu().numpy(), euler_angles.cpu().numpy(), center_coords0.numpy()
             
     else: 
+        print("Memory Available: ", memory_limit)
+        print("Memory needed: ", (mem_center_coords + mem_ids))
         print("Available Memory: %d - Increase memory limit"%available_memory)
         return None, None, None
 
